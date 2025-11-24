@@ -1,7 +1,7 @@
 # Billingbook: Business Operating System
 **Document Type:** Functional Specification & Business Requirements  
 **Version:** 2.0 (Standardized)  
-**Date:** October 26, 2023
+**Date:** 24/11/2025
 
 ---
 
