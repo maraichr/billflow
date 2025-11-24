@@ -1,7 +1,3 @@
-Of course. Here is the transformed business-friendly document based on the provided technical PRD.
-
----
-
 ## Billingbook: Business Overview and System Specification
 
 This document provides a clear, business-focused overview of the Billingbook platform. It is intended for product managers, business stakeholders, and other non-technical team members to understand the system's capabilities, workflows, and data structure.
