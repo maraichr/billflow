@@ -1,198 +1,179 @@
-## Billingbook: Business Overview and System Specification
-
-This document provides a clear, business-focused overview of the Billingbook platform. It is intended for product managers, business stakeholders, and other non-technical team members to understand the system's capabilities, workflows, and data structure.
-
-### 1. Executive Summary
-
-#### System Overview
-Billingbook is an all-in-one business management platform designed for small businesses and freelancers. It combines a public marketplace for advertising products and services, a powerful Customer Relationship Management (CRM) tool for managing sales leads, and a complete billing system for invoicing and tracking payments. This integrated approach allows users to manage their entire business lifecycle—from attracting new customers to getting paid—within a single application.
-
-#### Target Audience & Needs
-The platform serves several key user groups:
-*   **Small Business Owners & Freelancers:** Need a simple, cost-effective way to find leads, manage client relationships, and handle financial administration without juggling multiple software tools.
-*   **Brokers & Agents (e.g., Real Estate, Automotive):** Require a system to manage leads generated from public listings and track complex transactions through to completion.
-*   **Referral Partners & Lead Generators:** Participate in a commission-based ecosystem by sourcing and providing leads to service providers on the platform.
-*   **End-Customers:** The clients of our users, who need a simple way to view and pay invoices online.
-
-#### Key Business Capabilities
-1.  **Comprehensive Billing & Invoicing:** Create professional invoices, manage a customer database, define a product catalog, apply taxes (VAT) and discounts, record payments, and generate customer statements.
-2.  **Lead-to-Cash CRM:** Manage a complete sales pipeline, from capturing a new lead, assigning it to a team member, tracking negotiations with notes and updates, and converting a successful deal into an invoice.
-3.  **Multi-Category Marketplace:** Publish classified ads for goods and services across diverse categories like property, vehicles, jobs, and tourism, creating a primary channel for lead generation.
-4.  **Collaborative Partner Network:** Supports a referral ecosystem where users can act as `Service Providers`, `Lead Generators`, or `Lead Sources`, enabling commission-based partnerships.
-5.  **Integrated Communication:** Built-in messaging, user walls, and social features foster a community and allow for seamless communication between business partners on the platform.
-6.  **Customizable User Experience:** Users can enable or disable major modules (e.g., CRM, Social) and customize CRM fields to tailor the platform to their specific business needs.
-
-#### Business Value Proposition
-Billingbook eliminates the complexity and cost of using separate tools for marketing, sales, and finance. By providing a single, unified platform, it empowers small businesses to streamline operations, reduce software expenses, and gain a holistic view of their business health—from initial lead to final payment.
+# Billingbook: Business Operating System
+**Document Type:** Functional Specification & Business Requirements  
+**Version:** 2.0 (Standardized)  
+**Date:** October 26, 2023
 
 ---
 
-### 2. Standardized API Specification
+## 1. Executive Summary
 
-The following is a standardized, RESTful API design for the core resources within Billingbook. This specification promotes consistency, predictability, and ease of integration.
+### 1.1 System Overview
+**Billingbook** is a comprehensive **Business Operating System** designed for Small to Medium Enterprises (SMEs) and freelancers. It unifies three traditionally fragmented business functions—Customer Relationship Management (CRM), Financial Operations (ERP), and Social Networking—into a single "Super App."
 
-**Naming Convention:** `/api/v1/{resource}/{id}/{action}`
+Instead of juggling separate tools for marketing (Facebook), lead tracking (Excel), and billing (Accounting Software), Billingbook offers a unified "Lead-to-Cash" workflow. It allows users to market services, acquire leads through a marketplace, manage client negotiations, and seamlessly convert closed deals into paid invoices.
 
-#### Customers API
-Manages the customers of a platform user.
+### 1.2 Target Audience
+*   **Service Providers (SMEs):** Businesses requiring an all-in-one tool to find work, manage clients, and handle billing.
+*   **Lead Generators:** Agents who source business opportunities and monetize them by selling leads on the platform.
+*   **Marketplace Consumers:** Individuals browsing specific vertical directories (Motoring, Art, Tourism) or looking for services.
+*   **Platform Administrators:** Staff responsible for content moderation, user verification, and marketplace oversight.
 
-| Endpoint | Method | Description | Request Body Schema | Response Schema | Permissions |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `/api/v1/customers` | `GET` | Retrieve a list of all customers for the authenticated user. | N/A | Array of Customer objects | User |
-| `/api/v1/customers` | `POST` | Create a new customer. | Customer object (name, email, etc.) | The newly created Customer object | User |
-| `/api/v1/customers/{id}` | `GET` | Retrieve a single customer by their ID. | N/A | A single Customer object | User (Owner) |
-| `/api/v1/customers/{id}` | `PUT` | Update an existing customer's details. | Customer object with updated fields | The updated Customer object | User (Owner) |
-| `/api/v1/customers/{id}` | `DELETE` | Deactivate a customer record (soft delete). | N/A | `{ "status": "deactivated" }` | User (Owner) |
+### 1.3 Key Business Capabilities
+1.  **Unified Financial Suite:** A complete cycle for managing products, generating quotes, and issuing invoices with automated tax/VAT calculations and payment tracking.
+2.  **Lead Exchange Marketplace:** A dynamic engine where business opportunities are created, categorized (e.g., "For Sale" vs. "Wanted"), and distributed to service providers via AI matching or manual claiming.
+3.  **Vertical-Specific Directories:** Specialized listing capabilities for distinct industries (e.g., detailed VIN/Engine specs for Motoring, exhibition details for Art) rather than generic listing fields.
+4.  **Social Commerce Graph:** A built-in social network allowing businesses to build brand equity through profiles, newsfeeds, and direct messaging, fostering trust before transactions occur.
+5.  **Geo-Spatial Targeting:** A strict location hierarchy ensures users only see leads, listings, and services relevant to their specific region (Country down to Town level).
 
-#### Invoices API
-Manages financial invoices.
-
-| Endpoint | Method | Description | Request Body Schema | Response Schema | Permissions |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `/api/v1/invoices` | `GET` | Retrieve a list of all invoices for the user. | N/A | Array of Invoice objects | User |
-| `/api/v1/invoices` | `POST` | Create a new draft invoice. | `{ "customerId": "uuid", "items": [...] }` | The newly created Invoice object | User |
-| `/api/v1/invoices/{id}` | `GET` | Retrieve a single invoice by its ID. | N/A | A single Invoice object with items | User (Owner) |
-| `/api/v1/invoices/{id}/view` | `GET` | Retrieve the public view of an invoice using its secret key. | N/A | Public Invoice object | Public (with key) |
-| `/api/v1/invoices/{id}/payments` | `POST` | Record a payment against an invoice. | `{ "amount": 100.00, "paymentDate": "YYYY-MM-DD" }` | The updated Invoice object | User (Owner) |
-
-#### Leads API
-Manages sales leads in the CRM.
-
-| Endpoint | Method | Description | Request Body Schema | Response Schema | Permissions |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `/api/v1/leads` | `GET` | Retrieve a list of leads (e.g., open, or owned by the user). | N/A | Array of Lead objects | User |
-| `/api/v1/leads` | `POST` | Create a new lead and post it to the marketplace. | Lead object (title, value, description) | The newly created Lead object | User |
-| `/api/v1/leads/{id}` | `GET` | Retrieve a single lead by its ID. | N/A | A single Lead object | User (Owner/Claimant) |
-| `/api/v1/leads/{id}/claim` | `POST` | Claim an open lead to begin working on it. | N/A | The updated Lead object | User (Service Provider) |
-| `/api/v1/leads/{id}/notes` | `POST` | Add a note or update to a lead's transaction log. | `{ "type": "update", "content": "..." }` | The newly created Note object | User (Owner/Claimant) |
+### 1.4 Value Proposition
+Billingbook reduces operational friction for small businesses. By integrating the **source of revenue** (leads/marketplace) directly with the **management of revenue** (invoicing/CRM), the platform significantly reduces administrative time and increases the speed at which service providers can find work and get paid.
 
 ---
 
-### 3. Simplified Data Model
+## 2. API Standardization
 
-The system's data is organized into logical business domains. Technical prefixes have been removed for clarity.
+The following specification standardizes the legacy backend into a modern, RESTful API architecture.
 
-#### Identity & Access Management
-This domain manages who can access the platform and what they can do.
-*   **User:** The central account for an individual or business using Billingbook. It stores login credentials, profile information, and company details.
-*   **User Setting:** Contains preferences and feature flags for a **User**, such as which modules (Billing, CRM) are active and custom field names.
-*   **Relationships:** A **User** has one **User Setting** profile that controls their experience.
+**Base URL:** `https://api.billingbook.com/api/v1`
 
-#### CRM & Leads
-This domain covers the entire sales and customer relationship lifecycle.
-*   **Lead:** A potential business opportunity, with a value, description, and status. Leads can be "Open" for anyone to claim or "Exclusive" to a specific user.
-*   **Transaction Note:** A message, update, or offer related to a **Lead**. These notes form the history of a deal's negotiation.
-*   **Relationships:** A **Lead** can have many **Transaction Notes**. A **User** can create a **Lead**, and another **User** (a Service Provider) can claim it.
+### 2.1 Core Resources
 
-#### Billing & Finance
-This domain handles all financial transactions.
-*   **Customer:** A client of a platform **User**. This is the entity that receives invoices, not a user of the platform itself.
-*   **Product:** A reusable service or item with a standard price, which a **User** can add to their invoices.
-*   **Invoice:** A financial document sent to a **Customer**. It contains line items, totals, tax, and payment status.
-*   **Invoice Item:** A single line on an **Invoice**, detailing the product, quantity, and price.
-*   **Payment:** A record of money received from a **Customer** for a specific **Invoice**.
-*   **Relationships:** A **User** owns many **Customers**. An **Invoice** is sent to one **Customer** and contains many **Invoice Items**. An **Invoice** can have multiple **Payments** recorded against it until it is fully paid.
+| Resource | Description |
+| :--- | :--- |
+| `/users` | Identity management and profile settings |
+| `/customers` | Client data management for billing purposes |
+| `/leads` | The marketplace of business opportunities |
+| `/invoices` | Financial records and billing documents |
+| `/listings` | Vertical-specific marketplace items (Cars, Art, etc.) |
 
-#### Marketplace & Listings
-This domain manages the public classifieds portal.
-*   **Listing:** A public advertisement for an item or service (e.g., a car for sale, a property for rent). It contains all the details, images, and pricing for the ad.
-*   **Listing Type / Category:** The classification system that organizes **Listings** (e.g., Type: Motoring, Category: Cars).
-*   **Relationships:** A **User** creates a **Listing** to advertise their offerings. These **Listings** are the primary source for generating new **Leads** in the CRM.
+### 2.2 Endpoint Specification
 
----
+#### Customers (Billing Entities)
+*Manage the clients that users are invoicing.*
 
-### 4. Key Business Rules & Logic
+*   **List Customers**
+    *   `GET /customers`
+    *   *Permissions:* User (Own records only)
+*   **Create Customer**
+    *   `POST /customers`
+    *   *Body:* `{ "name": "Acme Corp", "email": "contact@acme.com", "vat_number": "12345", "address": {...} }`
+*   **Update Customer**
+    *   `PUT /customers/{id}`
+    *   *Body:* `{ "status": "active", "pricing_tier_id": "tier_02" }`
+*   **Delete Customer**
+    *   `DELETE /customers/{id}`
 
-This section translates technical rules into plain business logic.
+#### Invoices (Financials)
+*Manage the full billing lifecycle.*
 
-#### Workflow States (Lifecycles)
+*   **Create Invoice**
+    *   `POST /invoices`
+    *   *Body:* `{ "customer_id": "uuid", "due_date": "2023-12-01", "items": [ { "product_id": "uuid", "qty": 2 } ] }`
+*   **Get Invoice Details**
+    *   `GET /invoices/{id}`
+    *   *Response:* Returns full invoice object including calculated tax totals and line items.
+*   **Finalize Invoice**
+    *   `POST /invoices/{id}/finalize`
+    *   *Action:* Locks the invoice from editing and assigns a final invoice number.
+*   **Public View**
+    *   `GET /public/invoices/{view_key}`
+    *   *Permissions:* Public (No Auth required - for client viewing).
 
-*   **Lead Status:**
-    1.  **New:** A lead is created and is available on the marketplace.
-    2.  **Active:** A Service Provider has claimed the lead and is reviewing it.
-    3.  **In Progress:** The provider is actively negotiating with the potential customer.
-    4.  **Finalized:** The deal is closed (either won or lost).
+#### Leads (CRM & Marketplace)
+*Manage the acquisition and processing of leads.*
 
-*   **Invoice Status:**
-    1.  **Pending:** The invoice has been created and sent to the customer but is not yet paid.
-    2.  **Paid:** The sum of all recorded payments equals the total invoice amount. The invoice is considered closed.
-
-*   **Customer CRM Status:**
-    1.  **New/Open:** A potential customer or active prospect.
-    2.  **In Progress:** The user is actively engaged in a sales process with the customer.
-    3.  **Completed/Declined:** The sales process has concluded, either successfully or unsuccessfully.
-
-#### Financial Calculations
-
-*   **Invoice Line Item Total:**
-    *   `Line Item Total = (Quantity × Price per Unit) - Discount`
-*   **Invoice Subtotal:**
-    *   `Subtotal = Sum of all Line Item Totals`
-*   **Invoice Total (Amount Due):**
-    *   `Total = Subtotal + VAT Amount`
-*   **Invoice Amount Due (Balance):**
-    *   `Amount Due = Invoice Total - Sum of all Payments`
+*   **Browse Leads**
+    *   `GET /leads`
+    *   *Filters:* `?type=physical&category=motoring&location=ny`
+*   **Claim Lead**
+    *   `POST /leads/{id}/claim`
+    *   *Action:* Assigns the lead to the current user and moves it to the "Transaction" phase.
+*   **Update Transaction Status**
+    *   `PUT /leads/{id}/transaction`
+    *   *Body:* `{ "status": "negotiating", "notes": "Client requested 10% discount" }`
 
 ---
 
-### 5. Core Business Workflows
+## 3. Data Model Simplification
 
-#### Workflow 1: Lead-to-Invoice Process
-This workflow describes the journey from a new business opportunity to a paid invoice.
+The data structure has been reorganized into logical business domains, removing technical prefixes.
 
-*   **Roles Involved:** Lead Generator (optional), Service Provider (User), End-Customer.
-*   **Process:**
-    1.  A **Lead Generator** or **Service Provider** creates a new **Lead** (e.g., "Looking for a web designer").
-    2.  The Lead appears on the internal marketplace. If it's "Open," any registered **Service Provider** can see it.
-    3.  A **Service Provider** claims the Lead, changing its status to "Active." The lead is now assigned to them.
-    4.  The provider engages with the prospect, logging all communication as **Transaction Notes** (e.g., "Sent proposal," "Customer offered $500"). The status moves to "In Progress."
-    5.  An agreement is reached. The provider marks the Lead as "Finalized."
-    6.  The provider navigates to the Billing module and creates a new **Invoice** for their **Customer**.
-    7.  The system generates the invoice, which is sent to the End-Customer for payment.
-*   **Decision Points:**
-    *   Should a Service Provider claim an open lead?
-    *   Is the offer in a transaction note acceptable?
-*   **Expected Outcome:** A successful deal is converted into a payable invoice, and commissions (if any) are calculated for the Lead Generator/Source.
+### Domain 1: Identity & Access
+*   **User:** The central login entity. Stores authentication, KYC status (Verified/Unverified), and tax settings (VAT Registered Y/N).
+*   **User Settings:** Controls feature toggles. Allows a user to enable/disable specific modules (e.g., "Enable CRM," "Enable Motoring Vertical").
+*   **Location:** Hierarchical data (Country > Province > District > Town) used for filtering content.
 
-#### Workflow 2: Standard Billing Process
-This workflow describes how a user bills a customer for products or services.
+### Domain 2: CRM & Sales
+*   **Lead:** A raw business opportunity containing a value, type (Goods vs. Services), and exclusivity status (Open vs. Exclusive).
+*   **Lead Claim:** A record tracking the transfer of a lead from a "Generator" to a "Service Provider."
+*   **Transaction:** The "Deal Room." Created once a lead is claimed. Stores negotiation history, digital handshakes (approvals from both sides), and conversion status.
 
-*   **Roles Involved:** User, End-Customer.
-*   **Process:**
-    1.  The **User** adds a new client to their **Customer** list.
-    2.  The User creates a new **Invoice**, selecting the Customer from their list.
-    3.  The User adds **Invoice Items** by selecting from their predefined **Product** catalog or by entering ad-hoc items with custom descriptions and prices.
-    4.  The system automatically calculates the subtotal, applies the User's default VAT rate, and computes the final total.
-    5.  The User saves and sends the invoice. Its status is now **Pending**.
-    6.  The **End-Customer** makes a payment. The User records this **Payment** against the invoice.
-    7.  Once payments cover the full invoice amount, the system automatically updates the invoice status to **Paid**.
-*   **Decision Points:**
-    *   Apply a line-item or overall discount?
-    *   Mark the invoice as paid manually or record a partial payment?
-*   **Expected Outcome:** The User's financial records are updated, the invoice is marked as paid, and the customer's account statement reflects the transaction.
+### Domain 3: Finance (Billing)
+*   **Customer:** The entity being billed. Distinct from a system "User." Contains specific billing preferences and pricing strategies.
+*   **Product:** Inventory items or services available for sale. Tracks stock levels for physical goods.
+*   **Invoice:** The legal financial request. Links a Customer to Products.
+*   **Invoice Item:** Individual lines on an invoice. Supports temporary session storage (shopping cart functionality).
+
+### Domain 4: Vertical Marketplaces
+*   **Vehicle Listing:** Specialized inventory for the Motoring sector (VIN, Mileage, Maintenance Plans).
+*   **Attraction Listing:** Specialized inventory for Tourism (Map coordinates, WhatsApp contact integration).
+*   **Social Post:** User-generated content for the newsfeed.
 
 ---
 
-### 6. Recommendations
+## 4. Business Rules Translation
 
-Based on the analysis of the system architecture, we recommend the following enhancements to improve functionality, user experience, and security.
+### Financial Rules
+1.  **Tax Compliance:** If a user is flagged as `VAT Registered`, the system must automatically calculate tax on all generated invoices based on the `users_vat_tax_rate`.
+2.  **Invoice Locking:** Invoices in `Draft` status can be edited. Once moved to `Finalized` or `Sent`, the invoice is locked to preserve audit trails.
+3.  **Pricing Strategies:** Customers can be assigned specific pricing tiers (Retail, Wholesale, Volume). The system automatically applies the correct price for that customer when items are added to an invoice.
 
-#### Missing Functionality
-*   **Payment Gateway Integration:** The current system relies on manually recording payments. Integrating with gateways like Stripe or PayPal would automate payment collection and reconciliation, significantly improving efficiency.
-*   **Recurring Invoices:** Many businesses use subscription or retainer models. The ability to automatically generate and send invoices on a recurring schedule (e.g., monthly) is a critical missing feature.
-*   **Reporting & Dashboards:** The system collects valuable data but lacks a dedicated reporting module. Dashboards showing revenue over time, outstanding payments, and lead conversion rates would provide immense value to users.
-*   **Quote/Estimate Generation:** A workflow to create and send quotes that can be approved by a client and converted into an invoice with one click would streamline the sales process.
+### Marketplace Rules
+1.  **Lead Exclusivity:**
+    *   *Open Leads:* Visible to all service providers; first to claim gets it.
+    *   *Exclusive Leads:* Only visible to specific providers matched by the system.
+2.  **The "Handshake" Protocol:** A transaction cannot be closed until both the Buyer and the Seller have digitally approved the terms (`lead_seller_approve` AND `lead_buyer_approve` are both True).
+3.  **Automated Billing Trigger:** When a transaction is marked `Closed/Won`, the system automatically generates a draft Invoice populated with the transaction details.
 
-#### User Experience (UX) Improvements
-*   **Simplified Listing Creation:** The listing creation process appears to be a multi-step wizard tracked by several boolean flags (`listing_loaded_step_...`). This could be simplified into a more fluid, single-page form with better user guidance to reduce friction.
-*   **Consolidate User Profile:** The `User` and `User Setting` entities contain overlapping information (e.g., VAT settings). Merging these would simplify account management for the user and reduce data redundancy.
-*   **Contextual Social Features:** The social features (friends, followers) feel disconnected from the core business workflows. They should be integrated more contextually, for example, by highlighting trusted partners or showing transaction history with a connection.
+---
 
-#### Data Integrity Enhancements
-*   **Remove Redundant Fields:** Fields like `users_vat_registered` exist in both the `User` and `User Setting` tables. This creates a risk of data inconsistency. The data model should be refactored to have a single source of truth for such settings.
-*   **Enforce Data Constraints:** Many critical fields are nullable (can be empty), which can lead to incomplete records. Fields like `users_email`, `customers_name`, and `invoice_amount` should be made mandatory at the database level.
+## 5. Workflow Documentation
 
-#### Security Considerations
-*   **CRITICAL - Secure Storage of Sensitive Data:** The `users_banking_details` field appears to store sensitive financial information as plain text. This is a major security vulnerability. All such data **must** be encrypted at rest, and access must be strictly controlled. It is highly recommended to integrate with a compliant third-party provider for handling banking data.
-*   **CRITICAL - Password Management:** The presence of a `users_secret_md5` field suggests a legacy, insecure password hashing algorithm (MD5) may be in use. All passwords must be hashed using a modern, strong algorithm like Argon2 or bcrypt.
-*   **Secure Public Invoice Links:** The `invoices_secret_public_view_key` is a good feature but must be implemented with a cryptographically secure random token to prevent unauthorized users from guessing URLs and accessing invoice data.
+### Workflow A: The Lead-to-Cash Cycle
+*The primary revenue journey for a Service Provider.*
+
+1.  **Lead Generation:** A Lead Generator posts a request (e.g., "I need a web designer").
+    *   *System:* Creates a Lead record with status `New`.
+2.  **Distribution:** The system matches the lead to relevant providers based on Location and Category.
+3.  **Claiming:** A Service Provider views the lead and clicks "Claim."
+    *   *System:* Changes status to `In Progress`, creates a Transaction record, and hides the lead from other providers.
+4.  **Negotiation:** Provider and Client exchange notes and files via the Transaction dashboard.
+5.  **Agreement:** Both parties click "Approve" (Digital Handshake).
+6.  **Conversion:** Provider clicks "Generate Invoice."
+    *   *System:* Converts Transaction data into an Invoice Draft.
+7.  **Payment:** Provider finalizes the invoice and sends the secure link to the Client.
+
+### Workflow B: Vertical Listing Creation (e.g., Selling a Car)
+1.  **Initiation:** User selects "Create Listing" -> "Motoring."
+2.  **Data Entry:** User inputs standard data (Price, Title) and Domain Data (VIN, Engine Specs).
+3.  **Validation:** System checks required fields.
+4.  **Moderation:** Listing enters `Pending Approval` queue.
+5.  **Publication:** Admin approves listing; it becomes visible in the Motoring Directory and on the User's Social Wall.
+
+---
+
+## 6. Recommendations
+
+Based on the analysis of the legacy system, the following improvements are recommended for the roadmap:
+
+### 6.1 Functional Gaps
+*   **Payment Gateway Integration:** The current system tracks "Paid" status but does not appear to process credit cards. **Recommendation:** Integrate Stripe or PayPal to allow clients to pay invoices directly via the "Public View" link.
+*   **Dispute Resolution:** There is no workflow for when a "Handshake" goes wrong. **Recommendation:** Add a "Raise Dispute" status to Transactions that alerts Admins.
+
+### 6.2 User Experience (UX)
+*   **Mobile App/PWA:** The heavy reliance on "WhatsApp" integration implies users are mobile. **Recommendation:** Ensure the frontend is a Progressive Web App (PWA) optimized for mobile usage.
+*   **Onboarding Wizard:** The "User Settings" are complex. **Recommendation:** Create a "Getting Started" wizard that asks "What is your business?" and auto-configures the toggles (CRM, Social, etc.).
+
+### 6.3 Security & Data Integrity
+*   **Authentication:** The current "Secret Public View Key" for invoices is a security risk if guessed. **Recommendation:** Implement signed URLs with expiration times for public invoice viewing.
+*   **Audit Logging:** While transaction notes exist, a dedicated system audit log (who changed what and when) is missing and critical for financial compliance.
